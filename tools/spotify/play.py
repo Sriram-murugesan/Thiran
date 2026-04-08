@@ -12,13 +12,26 @@ to the operating system to auto-start playback.
 from __future__ import annotations
 
 import re
+import subprocess
 import urllib.parse
 import urllib.request
-import webbrowser
 from typing import Any
 
 from core.models import ToolResult
 from tools.base import BaseTool, SlotField
+
+
+def _open_brave(url: str) -> bool:
+    """Open a URL in the Brave browser. Returns True on success."""
+    try:
+        subprocess.Popen(
+            ["brave-browser", "--new-window", url],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return True
+    except FileNotFoundError:
+        return False
 
 
 class SpotifyPlayTool(BaseTool):
@@ -104,7 +117,7 @@ class SpotifyPlayTool(BaseTool):
             target_url = f"https://open.spotify.com/search/{encoded}"
 
         log.info("spotify.play.opening", url=target_url, display=display)
-        opened = webbrowser.open(target_url)
+        opened = _open_brave(target_url)
 
         if not opened:
             return ToolResult(

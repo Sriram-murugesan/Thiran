@@ -47,6 +47,7 @@ from core.models import (
     IntentName,
     ValidationError,
     InteractionContext,
+    ValidatedIntent,
 )
 from core.nlu import NLUEngine, check_groq_reachable
 from core.tts import TTSEngine, TTSService
@@ -407,9 +408,12 @@ class VoiceAgent:
                 trace=trace,
             )
 
-            # 3. Speak response
+            # 3. Update intent panel and speak response
             t0_tts = time.monotonic_ns()
-            from core.tui import set_tui_status
+            from core.tui import set_tui_status, set_tui_intent
+            intent_label = response.intent.value if response.intent else None
+            tool_msg = response.tool_result.message if response.tool_result else None
+            set_tui_intent(intent_label, response.pipeline_success, tool_msg)
             set_tui_status("🔊 Speaking...")
             await self._tts.speak(response.response_text, request_id=request_id)
             trace.record_latency("tts", (time.monotonic_ns() - t0_tts) // 1_000_000)
@@ -422,7 +426,7 @@ class VoiceAgent:
             # Explicit telemetry markers required by systems engineer review
             trace.cache_hit = getattr(self._nlu, "_last_hit", False)
             trace.recording_duration_ms = segment.duration_ms
-            trace.time_to_response_ms = segment.duration_ms + (t0_tts - total_start_ns) // 1_000_000
+            trace.time_to_response_ms = (t0_tts - total_start_ns) // 1_000_000
             
             self._telemetry.flush(trace)
 

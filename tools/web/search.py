@@ -9,12 +9,25 @@ Supports Google and DuckDuckGo (both privacy-respecting fallbacks available).
 
 from __future__ import annotations
 
+import subprocess
 import urllib.parse
-import webbrowser
 from typing import Any
 
 from core.models import ToolResult
 from tools.base import BaseTool, SlotField
+
+
+def _open_brave(url: str) -> bool:
+    """Open a URL in the Brave browser. Returns True on success."""
+    try:
+        subprocess.Popen(
+            ["brave-browser", "--new-window", url],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return True
+    except FileNotFoundError:
+        return False
 
 _SEARCH_URLS: dict[str, str] = {
     "google": "https://www.google.com/search?q={}",
@@ -66,7 +79,7 @@ class WebSearchTool(BaseTool):
         engine_label = engine.capitalize()
         log.info("web.search.open", engine=engine, url=url)
 
-        opened = webbrowser.open(url)
+        opened = _open_brave(url)
 
         if not opened:
             return ToolResult(

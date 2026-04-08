@@ -12,13 +12,26 @@ Strategy:
 from __future__ import annotations
 
 import re
+import subprocess
 import urllib.parse
 import urllib.request
-import webbrowser
 from typing import Any
 
 from core.models import ToolResult
 from tools.base import BaseTool, SlotField
+
+
+def _open_brave(url: str) -> bool:
+    """Open a URL in the Brave browser. Returns True on success."""
+    try:
+        subprocess.Popen(
+            ["brave-browser", "--new-window", url],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return True
+    except FileNotFoundError:
+        return False
 
 
 class _YouTubeBaseTool(BaseTool):
@@ -40,7 +53,7 @@ class _YouTubeBaseTool(BaseTool):
         url = self._build_url(query)
         log.info("youtube.open", action=action_label, url=url)
 
-        opened = webbrowser.open(url)
+        opened = _open_brave(url)
 
         if not opened:
             return ToolResult(
@@ -114,7 +127,7 @@ class YouTubePlayTool(_YouTubeBaseTool):
             )
 
         log.info("youtube.play.opening_direct", url=target_url, query=query)
-        opened = webbrowser.open(target_url)
+        opened = _open_brave(target_url)
 
         if not opened:
             return ToolResult(

@@ -458,6 +458,3 @@ class NLUEngine:
             }
         )
 
-    @staticmethod
-    def _fallback_json(transcript: str) -> str:
-        return NLUEngine._clarify_json(transcript)
