@@ -1,0 +1,69 @@
+# config/known_apps.yaml
+# ======================
+# Alias → shell command mapping for the system.open_app tool.
+#
+# Keys are lowercase aliases the user might say.
+# Values are the shell commands to launch each app.
+# If an alias is NOT found here, the tool attempts to launch
+# the app_name directly as a shell command (fallback).
+#
+# Add new applications by appending a key-value pair below.
+# No restart required — the file is read at tool import time (cached).
+
+# Browsers
+chrome: google-chrome
+chromium: chromium-browser
+firefox: firefox
+brave: brave-browser
+edge: microsoft-edge
+
+# Terminals
+terminal: gnome-terminal
+konsole: konsole
+alacritty: alacritty
+kitty: kitty
+xterm: xterm
+
+# Editors / IDEs
+vs code: code
+vscode: code
+code: code
+vim: gnome-terminal -- vim
+neovim: gnome-terminal -- nvim
+sublime: subl
+gedit: gedit
+nano: gnome-terminal -- nano
+
+# File managers
+files: nautilus
+nautilus: nautilus
+dolphin: dolphin
+thunar: thunar
+
+# Media
+vlc: vlc
+mpv: mpv
+spotify: spotify
+rhythmbox: rhythmbox
+
+# Communication
+discord: discord
+slack: slack
+telegram: telegram-desktop
+signal: signal-desktop
+zoom: zoom
+
+# Productivity
+obsidian: obsidian
+notion: notion
+libreoffice: libreoffice
+writer: libreoffice --writer
+calc: libreoffice --calc
+impress: libreoffice --impress
+
+# System utilities
+settings: gnome-control-center
+system monitor: gnome-system-monitor
+task manager: gnome-system-monitor
+calculator: gnome-calculator
+screenshot: gnome-screenshot

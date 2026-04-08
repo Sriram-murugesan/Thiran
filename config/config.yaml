@@ -1,0 +1,43 @@
+# config/config.yaml
+# ==================
+# Voice Agent configuration.
+# All values here are defaults; override via environment variables or
+# a local config.local.yaml (not committed to version control).
+
+# ── Logging ────────────────────────────────────────────────────────────────
+log_level: INFO           # DEBUG | INFO | WARNING | ERROR
+
+# ── Push-to-talk ───────────────────────────────────────────────────────────
+ptt:
+  hotkey: space           # Key to hold while speaking
+
+# ── ASR (faster-whisper) ───────────────────────────────────────────────────
+asr:
+  model_size: small.en    # tiny.en | base.en | small.en | medium.en | large-v3
+  device: cpu             # cpu | cuda
+  compute_type: int8      # int8 (cpu) | float16 (cuda)
+  beam_size: 1            # 1 = greedy (fastest); 5 = more accurate
+  language: en            # Force language; null = auto-detect
+  sample_rate: 16000      # Microphone sample rate (Hz)
+
+# ── NLU (Groq) ────────────────────────────────────────────────────────────
+nlu:
+  model: llama-3.1-8b-instant   # Model identifier for Groq
+  timeout_seconds: 5.0    # Max wait for Groq response
+  cache_max_size: 128     # Max LRU cache entries
+  cache_ttl_seconds: 300  # Time-to-live per cache entry (seconds)
+
+# ── TTS ────────────────────────────────────────────────────────────────────
+tts:
+  engine: pyttsx3                                   # coqui | pyttsx3 | console
+  coqui_model: tts_models/en/ljspeech/tacotron2-DDC # Only used if engine=coqui
+
+# ── Dispatcher ─────────────────────────────────────────────────────────────
+tool_timeout_seconds: 5.0
+
+# ── Rate limits (calls per window) ─────────────────────────────────────────
+# Defaults are in core/dispatcher.py; override here if needed.
+# rate_limits:
+#   spotify:
+#     max_calls: 10
+#     window_seconds: 60

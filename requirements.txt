@@ -1,0 +1,44 @@
+# requirements.txt
+# ================
+# Pinned to minimum compatible versions.
+# Install: pip install -r requirements.txt
+
+# ── Core framework ──────────────────────────────────────────────────────────
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+
+# ── Logging ─────────────────────────────────────────────────────────────────
+structlog>=24.1.0
+
+# ── Configuration ───────────────────────────────────────────────────────────
+pyyaml>=6.0.1
+
+# ── ASR ─────────────────────────────────────────────────────────────────────
+faster-whisper>=1.0.0      # Local Whisper inference via CTranslate2
+numpy>=1.24.0
+
+# ── Audio I/O ───────────────────────────────────────────────────────────────
+sounddevice>=0.4.6         # Mic input + speaker output
+keyboard>=0.13.5           # Push-to-talk key capture (requires root on Linux)
+
+# ── NLU (Ollama HTTP client) ─────────────────────────────────────────────────
+aiohttp>=3.9.0             # Async HTTP for Ollama REST API
+
+# ── TTS (primary) ───────────────────────────────────────────────────────────
+# TTS>=0.22.0                # Coqui TTS — comment out if using pyttsx3 only
+
+# ── TTS (fallback) ──────────────────────────────────────────────────────────
+pyttsx3>=2.90              # System TTS fallback (espeak on Linux)
+
+# ── System tools ─────────────────────────────────────────────────────────────
+# playerctl must be installed via system package manager:
+#   sudo apt install playerctl    (Ubuntu/Debian)
+#   sudo dnf install playerctl    (Fedora)
+# No Python package needed — invoked via asyncio.create_subprocess_exec
+
+# ── Optional: GPU acceleration for ASR ───────────────────────────────────────
+# Uncomment if using device=cuda in config.yaml:
+# torch>=2.1.0
+# nvidia-cublas-cu12
+# ── Semantic Intent Cache ───────────────────────────────────────────────────
+sentence-transformers>=2.2.2 # Local semantic intent caching
