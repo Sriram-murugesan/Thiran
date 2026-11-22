@@ -142,8 +142,44 @@ class TTSService:
 
             self._log.info("tts.loading_pyttsx3")
             engine = pyttsx3.init()
-            engine.setProperty("rate", 165)   # Words per minute
-            engine.setProperty("volume", 0.9)
+
+            # ── Female voice selection ──────────────────────────────────
+            # espeak-ng supports female variants via the '+f<N>' suffix.
+            # We prefer: en-us+f3 (clearest American female),
+            #            en-us+f2, en-gb+f3 as fallbacks.
+            _FEMALE_CANDIDATES = [
+                "gmw/en-us+f3",   # American English, female variant 3 (clearest)
+                "gmw/en-us+f2",   # American English, female variant 2
+                "gmw/en+f3",      # British English, female variant 3
+                "gmw/en+f2",
+            ]
+            voices = engine.getProperty("voices")
+            voice_ids = {v.id for v in voices}
+
+            selected_voice = None
+            for candidate in _FEMALE_CANDIDATES:
+                # pyttsx3 espeak driver accepts the variant suffix even if it is
+                # not listed as a discrete voice — try each directly.
+                try:
+                    engine.setProperty("voice", candidate)
+                    selected_voice = candidate
+                    self._log.info("tts.female_voice_selected", voice=candidate)
+                    break
+                except Exception:
+                    continue
+
+            if selected_voice is None:
+                # Last resort: pick the first English voice available
+                en_voices = [v for v in voices if "en" in str(v.id)]
+                if en_voices:
+                    engine.setProperty("voice", en_voices[0].id)
+                    self._log.warning("tts.female_voice_fallback", voice=en_voices[0].id)
+
+            # ── Speech quality tuning ───────────────────────────────────
+            engine.setProperty("rate", 150)    # Slightly slower → clearer
+            engine.setProperty("volume", 1.0)  # Full volume
+            # ────────────────────────────────────────────────────────────
+
             self._pyttsx3_engine = engine
             self._log.info("tts.pyttsx3_loaded")
             return True

@@ -56,10 +56,13 @@ from tools.agent.fallbacks import ClarifyTool, UnknownTool
 from tools.spotify.controls import SpotifyPauseTool, SpotifySkipTool, SpotifyVolumeTool
 from tools.spotify.play import SpotifyPlayTool
 from tools.system.open_app import SystemOpenAppTool
+from tools.system.package_manager import SystemInstallAppTool, SystemUpdateAppTool
 from tools.system.timer import SystemTimerTool, set_alert_queue
 from tools.system.volume import SystemVolumeTool
 from tools.web.search import WebSearchTool
+from tools.web.answer import WebAnswerTool
 from tools.youtube.play import YouTubePlayTool, YouTubeSearchTool
+from tools.gmail.read import GmailReadTool
 from core.telemetry import AgentTrace, StructlogTelemetrySink
 
 # ---------------------------------------------------------------------------
@@ -261,9 +264,13 @@ class VoiceAgent:
             YouTubePlayTool(),
             YouTubeSearchTool(),
             SystemOpenAppTool(),
+            SystemInstallAppTool(),
+            SystemUpdateAppTool(),
             SystemVolumeTool(),
             SystemTimerTool(),
             WebSearchTool(),
+            WebAnswerTool(),
+            GmailReadTool(),
             ClarifyTool(),
             UnknownTool(),
         ]

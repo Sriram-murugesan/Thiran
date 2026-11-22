@@ -27,7 +27,7 @@ from core.models import ToolResult
 from tools.base import BaseTool, SlotField
 
 # Absolute path to known_apps.yaml, resolved from this file's location
-_CONFIG_PATH = Path(__file__).resolve().parents[3] / "config" / "known_apps.yaml"
+_CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "known_apps.yaml"
 
 
 @lru_cache(maxsize=1)

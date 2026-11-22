@@ -1,0 +1,21 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+# Load data
+data = pd.read_csv("students_pca.csv")
+
+# Features
+X = data[['study_hours', 'attendance', 'sleep_hours']]
+
+# Standardize (VERY IMPORTANT)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Apply PCA
+pca = PCA()
+X_pca = pca.fit_transform(X_scaled)
+
+# Explained variance
+print("Explained Variance:", pca.explained_variance_ratio_)

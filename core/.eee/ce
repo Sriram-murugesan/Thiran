@@ -1,0 +1,49 @@
+import pandas as pd
+import numpy as np
+
+# ---------------------------
+# 1. Load Dataset
+# ---------------------------
+data = pd.read_csv("data.csv")
+
+# ---------------------------
+# 2. Convert to numpy array
+# ---------------------------
+data = np.array(data)
+
+# ---------------------------
+# 3. Split X and y
+# ---------------------------
+X = data[:, :-1]
+y = data[:, -1]
+
+# ---------------------------
+# 4. Initialize S and G
+# ---------------------------
+S = X[0].copy()
+G = [['?' for _ in range(len(S))]]
+
+# ---------------------------
+# 5. Algorithm
+# ---------------------------
+for i in range(len(X)):
+    if y[i] == 'Yes':
+        # Generalize S
+        for j in range(len(S)):
+            if S[j] != X[i][j]:
+                S[j] = '?'
+    else:
+        # Specialize G
+        new_G = []
+        for j in range(len(S)):
+            if S[j] != X[i][j]:
+                temp = ['?' for _ in range(len(S))]
+                temp[j] = S[j]
+                new_G.append(temp)
+        G = new_G
+
+# ---------------------------
+# 6. Output
+# ---------------------------
+print("Final S:", S)
+print("Final G:", G)

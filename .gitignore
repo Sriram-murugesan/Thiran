@@ -50,3 +50,7 @@ config/config.local.yaml
 # Audio files captured during testing
 *.wav
 *.mp3
+
+# Secrets (Gmail integration)
+credentials.json
+token.json

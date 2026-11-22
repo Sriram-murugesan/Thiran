@@ -1,0 +1,28 @@
+import numpy as np
+from hmmlearn import hmm
+
+# Create model (2 hidden states)
+model = hmm.CategoricalHMM(n_components=2)
+
+# 1. Start probabilities
+model.startprob_ = np.array([0.6, 0.4])
+
+# 2. Transition probabilities
+model.transmat_ = np.array([
+    [0.7, 0.3],
+    [0.4, 0.6]
+])
+
+# 3. Emission probabilities
+model.emissionprob_ = np.array([
+    [0.9, 0.1],
+    [0.2, 0.8]
+])
+
+# Observations: Pass=0, Fail=1
+obs = np.array([[0], [0], [1]])
+
+# Predict hidden states
+hidden_states = model.predict(obs)
+
+print("Hidden states:", hidden_states)

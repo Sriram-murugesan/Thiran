@@ -118,23 +118,53 @@ class _SemanticIntentCache:
         self._store: OrderedDict[str, tuple[str, np.ndarray | None, str, float]] = OrderedDict()
 
     def _get_model(self) -> Any:
-        if self._model is None:
+        if self._model is not None:
+            return self._model if self._model is not False else None
+        try:
+            from sentence_transformers import SentenceTransformer
+        except ImportError:
+            structlog.get_logger().warning(
+                "nlu.semantic_cache_disabled",
+                msg="Install 'sentence-transformers' for semantic caching. Falling back to exact match.",
+            )
+            self._model = False
+            return None
+
+        try:
+            # 'all-MiniLM-L6-v2' is a local/offline-capable model — loading it
+            # may probe HuggingFace Hub for optional resources:
+            #   - additional_chat_templates → 404 (optional, ignore)
+            #   - 1_Pooling/config.json   → 307 redirect (handled automatically)
+            # Suppress noisy INFO logs from the hub client during these checks.
+            import logging
+            hf_logger = logging.getLogger("transformers_hub")
+            orig_level = hf_logger.level
+            hf_logger.setLevel(logging.ERROR)
             try:
-                from sentence_transformers import SentenceTransformer
-                self._model = SentenceTransformer("all-MiniLM-L6-v2")
-            except ImportError:
-                structlog.get_logger().warning(
-                    "nlu.semantic_cache_disabled",
-                    msg="Install 'sentence-transformers' for semantic caching. Falling back to exact match.",
-                )
-                self._model = False  # Mark as permanently disabled
+                self._model = SentenceTransformer("all-MiniLM-L6-v2", local_files_only=True)
+            finally:
+                hf_logger.setLevel(orig_level)
+        except Exception as exc:
+            structlog.get_logger().warning(
+                "nlu.semantic_cache_disabled",
+                msg=f"sentence-transformers model loading failed: {exc}. "
+                    "Falling back to exact-match cache only.",
+            )
+            self._model = False
         return self._model if self._model is not False else None
 
     def _embed(self, text: str) -> np.ndarray | None:
         model = self._get_model()
         if not model:
             return None
-        return model.encode(text.strip().lower(), convert_to_numpy=True)
+        try:
+            return model.encode(text.strip().lower(), convert_to_numpy=True)
+        except Exception as exc:
+            structlog.get_logger().warning(
+                "nlu.embedding_failed",
+                msg=f"Embedding encode failed: {exc}. Skipping semantic cache for this turn.",
+            )
+            return None
 
     def _cosine_similarity(self, a: np.ndarray, b: np.ndarray) -> float:
         norm_a = np.linalg.norm(a)

@@ -25,9 +25,9 @@ kitty: kitty
 xterm: xterm
 
 # Editors / IDEs
+code: code
 vs code: code
 vscode: code
-code: code
 vim: gnome-terminal -- vim
 neovim: gnome-terminal -- nvim
 sublime: subl

@@ -77,9 +77,15 @@ class IntentName(str, Enum):
     SYSTEM_OPEN_APP = "system.open_app"
     SYSTEM_VOLUME = "system.volume"
     SYSTEM_TIMER = "system.timer"
+    SYSTEM_INSTALL_APP = "system.install_app"
+    SYSTEM_UPDATE_APP = "system.update_app"
 
     # Web
     WEB_SEARCH = "web.search"
+    WEB_ANSWER = "web.answer"
+
+    # Gmail
+    GMAIL_READ = "gmail.read"
 
     # Agent-level (never executed as tools, handled by the agent loop)
     AGENT_CLARIFY = "agent.clarify"

@@ -334,7 +334,11 @@ def _validate_slots(
         IntentName.SYSTEM_OPEN_APP: _slots_system_open_app,
         IntentName.SYSTEM_VOLUME: _slots_volume,
         IntentName.SYSTEM_TIMER: _slots_system_timer,
+        IntentName.SYSTEM_INSTALL_APP: _slots_system_install_app,
+        IntentName.SYSTEM_UPDATE_APP: _slots_system_update_app,
         IntentName.WEB_SEARCH: _slots_web_search,
+        IntentName.WEB_ANSWER: _slots_query_required,
+        IntentName.GMAIL_READ: _slots_gmail_read,
         IntentName.AGENT_CLARIFY: _slots_no_slots,
         IntentName.AGENT_UNKNOWN: _slots_no_slots,
     }
@@ -724,3 +728,80 @@ def _slots_web_search(
         engine = SearchEngine.GOOGLE
 
     return {"query": str(query).strip(), "engine": engine.value}, coercions
+
+
+def _slots_system_install_app(
+    slots: _Slots,
+    request_id: str,
+    raw_transcript: str | None,
+    log: structlog.stdlib.BoundLogger,
+) -> tuple[_Slots, _CoercionLog] | ValidationError:
+    """
+    Validator for system.install_app.
+    Normalises package_name to lowercase. Also accepts 'app_name' as an
+    alias for compatibility with LLMs that reuse the open_app slot name.
+    """
+    # Accept both 'package_name' and 'app_name' (LLM alias)
+    pkg = slots.get("package_name") or slots.get("app_name")
+
+    if pkg is None or not str(pkg).strip():
+        log.warning("validator.missing_slot", slot="package_name", intent="system.install_app")
+        return ValidationError(
+            request_id=request_id,
+            code=ValidationErrorCode.MISSING_SLOT,
+            field="package_name",
+            message="Which application or package should I install?",
+            raw_payload=None,
+            raw_transcript=raw_transcript,
+        )
+
+    return {"package_name": str(pkg).strip().lower()}, []
+
+
+def _slots_system_update_app(
+    slots: _Slots,
+    request_id: str,
+    raw_transcript: str | None,
+    log: structlog.stdlib.BoundLogger,
+) -> tuple[_Slots, _CoercionLog]:
+    """
+    Validator for system.update_app.
+    package_name is OPTIONAL — absence means 'update everything'.
+    Also accepts 'app_name' as an LLM alias.
+    """
+    pkg = slots.get("package_name") or slots.get("app_name") or None
+    if pkg:
+        pkg = str(pkg).strip().lower() or None
+    return {"package_name": pkg}, []
+
+
+def _slots_gmail_read(
+    slots: _Slots,
+    request_id: str,
+    raw_transcript: str | None,
+    log: structlog.stdlib.BoundLogger,
+) -> tuple[_Slots, _CoercionLog] | ValidationError:
+    """
+    Validator for gmail.read.
+    Extracts the 'count' slot, ensures it's a valid integer, and clamps it
+    to a reasonable range [1, 10] to prevent excessively large LLM payloads
+    and slow TTS readouts.
+    """
+    coercions: _CoercionLog = []
+    
+    raw_count = slots.get("count", 5)
+    try:
+        count = int(raw_count)
+    except (TypeError, ValueError):
+        coercions.append(f"Invalid count '{raw_count}' defaulted to 5.")
+        log.warning("validator.coercion", slot="count", original=raw_count, coerced=5)
+        count = 5
+
+    # Clamp the count [1, 10] safely
+    if not (1 <= count <= 10):
+        clamped_count = max(1, min(10, count))
+        coercions.append(f"Count {count} clamped to {clamped_count} (valid range 1-10).")
+        log.warning("validator.coercion", slot="count", original=count, coerced=clamped_count)
+        count = clamped_count
+
+    return {"count": count}, coercions

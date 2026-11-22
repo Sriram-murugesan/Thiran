@@ -1,0 +1,24 @@
+give dataset for these ->from sklearn.cluster import AgglomerativeClustering
+from sklearn.metrics import silhouette_score
+
+# Use only features
+X = data[['study_hours', 'attendance']]
+
+# Model
+model = AgglomerativeClustering(n_clusters=2)
+
+labels = model.fit_predict(X)
+
+# Silhouette score
+print("Silhouette Score:", silhouette_score(X, labels))
+
+from scipy.cluster.hierarchy import dendrogram, linkage
+
+# Create linkage
+linked = linkage(X, method='ward')
+
+# Plot dendrogram
+plt.figure(figsize=(8,5))
+dendrogram(linked)
+plt.title("Dendrogram")
+plt.show()

@@ -1,0 +1,24 @@
+import pandas as pd
+from pgmpy.models import BayesianModel
+from pgmpy.estimators import MaximumLikelihoodEstimator
+from pgmpy.inference import VariableElimination
+
+# Load data
+data = pd.read_csv("students_bayes.csv")
+
+# Define model structure
+model = BayesianModel([
+    ('Study', 'Result'),
+    ('Attendance', 'Result')
+])
+
+# Train model (learn probabilities)
+model.fit(data, estimator=MaximumLikelihoodEstimator)
+
+# Inference
+infer = VariableElimination(model)
+
+# Query: probability of Result given evidence
+q = infer.query(variables=['Result'], evidence={'Study': 'high', 'Attendance': 'low'})
+
+print(q)

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth:*)",
+      "Bash(xdg-open:*)",
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('agent.py'\\).read\\(\\)\\)\")",
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('core/tui.py'\\).read\\(\\)\\)\")",
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('core/nlu.py'\\).read\\(\\)\\)\")",
+      "Bash(pip install:*)",
+      "Bash(python3:*)",
+      "Bash(python:*)"
+    ]
+  }
+}

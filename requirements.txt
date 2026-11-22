@@ -12,6 +12,7 @@ structlog>=24.1.0
 
 # ── Configuration ───────────────────────────────────────────────────────────
 pyyaml>=6.0.1
+python-dotenv>=1.0.0
 
 # ── ASR ─────────────────────────────────────────────────────────────────────
 faster-whisper>=1.0.0      # Local Whisper inference via CTranslate2
@@ -23,6 +24,7 @@ keyboard>=0.13.5           # Push-to-talk key capture (requires root on Linux)
 
 # ── NLU (Ollama HTTP client) ─────────────────────────────────────────────────
 aiohttp>=3.9.0             # Async HTTP for Ollama REST API
+brotli>=1.1.0              # Required by aiohttp for Brotli decompression
 
 # ── TTS (primary) ───────────────────────────────────────────────────────────
 # TTS>=0.22.0                # Coqui TTS — comment out if using pyttsx3 only
@@ -42,3 +44,10 @@ pyttsx3>=2.90              # System TTS fallback (espeak on Linux)
 # nvidia-cublas-cu12
 # ── Semantic Intent Cache ───────────────────────────────────────────────────
 sentence-transformers>=2.2.2 # Local semantic intent caching
+ddgs>=9.0.0                  # DuckDuckGo search for web.answer
+aiohttp[brotli]>=3.9.0       # Async HTTP with Brotli decompression
+
+# ── Gmail Integration ───────────────────────────────────────────────────────
+google-api-python-client>=2.0.0
+google-auth-httplib2>=0.1.0
+google-auth-oauthlib>=1.0.0
